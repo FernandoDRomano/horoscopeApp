@@ -1,6 +1,9 @@
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
+    id("kotlin-kapt")
+    id("com.google.dagger.hilt.android")
+    id("androidx.navigation.safeargs.kotlin")
 }
 
 android {
@@ -18,12 +21,17 @@ android {
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            buildConfigField("String", "BASE_URL", "\"https://newastro-produccion.vercel.app/\"") //LAS URLS VAN CON BARRA INVERTIDA PARA ESCAPAR LA CADENA
+        }
+
+        getByName("debug"){
+            buildConfigField("String", "BASE_URL", "\"https://newastro.vercel.app/\"") //LAS URLS VAN CON BARRA INVERTIDA PARA ESCAPAR LA CADENA
         }
     }
     compileOptions {
@@ -35,6 +43,7 @@ android {
     }
     buildFeatures{
         viewBinding = true
+        buildConfig = true
     }
 }
 
@@ -43,6 +52,15 @@ dependencies {
     val navVersion = "2.7.1"
     implementation("androidx.navigation:navigation-fragment-ktx:$navVersion")
     implementation("androidx.navigation:navigation-ui-ktx:$navVersion")
+
+    //LIBRERIA DE DAGGERHILT (INYECTOR DE DEPENDENCIAS)
+    implementation("com.google.dagger:hilt-android:2.48")
+    kapt("com.google.dagger:hilt-compiler:2.48")
+
+    //LIBRERIA DE RETROFIT (PARA PETICIONES API REST)
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.3.1") // ES UN INTERCEPTOR PARA DEBUGUEAR LAS PETICIONES REALIZADAS CON RETROFIT
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
